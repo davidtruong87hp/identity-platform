@@ -14,6 +14,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './strategies/jwt.strategy';
 import { ClientProxy } from '@nestjs/microservices';
+import { GoogleProfile } from './strategies/google.strategy';
 
 @Injectable()
 export class AuthService {
@@ -233,5 +234,53 @@ export class AuthService {
     });
 
     return { message: 'Password reset successfully' };
+  }
+
+  async socialLogin(provider: string, profile: GoogleProfile) {
+    // check if social account exists
+    const socialAccount = await this.prisma.socialAccount.findUnique({
+      where: {
+        provider_providerId: {
+          provider,
+          providerId: profile.id,
+        },
+      },
+      include: { user: true },
+    });
+
+    if (socialAccount) {
+      // user exists, generate tokens
+      const tokens = await this.generateTokens(
+        socialAccount.user.id,
+        socialAccount.user.email
+      );
+      return tokens;
+    }
+
+    // check if user exists with same email
+    let user = await this.userService.findByEmail(profile.email);
+
+    if (!user) {
+      // create new user
+      user = await this.userService.create({
+        email: profile.email,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        avatarUrl: profile.avatarUrl,
+        emailVerifiedAt: new Date(), // social login = email already verified
+      });
+    }
+
+    // create social account
+    await this.prisma.socialAccount.create({
+      data: {
+        userId: user.id,
+        provider,
+        providerId: profile.id,
+      },
+    });
+
+    const tokens = await this.generateTokens(user.id, user.email);
+    return tokens;
   }
 }

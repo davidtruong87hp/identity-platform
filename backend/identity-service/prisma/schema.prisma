@@ -13,21 +13,22 @@ datasource db {
 }
 
 model User {
-  id                    String         @id @default(uuid())
-  email                 String         @unique
-  password              String
+  id                    String          @id @default(uuid())
+  email                 String          @unique
+  password              String?
   firstName             String?
   lastName              String?
   avatarUrl             String?
-  isActive              Boolean        @default(true)
+  isActive              Boolean         @default(true)
   emailVerifiedAt       DateTime?
-  emailVerifyToken      String?        @unique
+  emailVerifyToken      String?         @unique
   emailVerifyTokenExp   DateTime?
-  passwordResetToken    String?        @unique
+  passwordResetToken    String?         @unique
   passwordResetTokenExp DateTime?
-  createdAt             DateTime       @default(now())
-  updatedAt             DateTime       @updatedAt
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
   refreshTokens         RefreshToken[]
+  socialAccounts        SocialAccount[]
 
   @@map("users")
 }
@@ -42,4 +43,16 @@ model RefreshToken {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("refresh_tokens")
+}
+
+model SocialAccount {
+  id         String   @id @default(uuid())
+  userId     String
+  provider   String // google, github, facebook, twitter
+  providerId String // the user's ID from the provider
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerId])
+  @@map("social_accounts")
 }

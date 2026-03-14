@@ -4,7 +4,7 @@ import {
   Get,
   Patch,
   Post,
-  Request,
+  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -32,14 +32,14 @@ export class ProfileController {
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiResponse({ status: 200, description: 'Returns user profile' })
   @Get()
-  getProfile(@Request() req: any) {
+  getProfile(@Req() req: any) {
     return this.profileService.getProfile(req.user.id);
   }
 
   @ApiOperation({ summary: 'Update current user profile' })
   @ApiResponse({ status: 200, description: 'Profile updated successfully' })
   @Patch()
-  updateProfile(@Request() req: any, @Body() dto: UpdateProfileDto) {
+  updateProfile(@Req() req: any, @Body() dto: UpdateProfileDto) {
     return this.profileService.updateProfile(req.user.id, dto);
   }
 
@@ -50,7 +50,7 @@ export class ProfileController {
   @Post('avatar')
   @UseInterceptors(FileInterceptor('file'))
   uploadAvatar(
-    @Request() req: any,
+    @Req() req: any,
     @UploadedFile(AvatarValidationPipe) file: Express.Multer.File
   ) {
     return this.profileService.uploadAvatar(req.user.id, file);

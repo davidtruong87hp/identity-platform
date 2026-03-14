@@ -5,10 +5,11 @@ import {
   HttpStatus,
   Post,
   Query,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
-import type { Response } from 'express';
+import type { Response, Request } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -23,11 +24,17 @@ import { LogoutDto } from './dto/logout.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { GoogleProfile } from './strategies/google.strategy';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService
+  ) {}
 
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, description: 'User registered successfully' })
@@ -111,5 +118,27 @@ export class AuthController {
   @Get('me')
   me() {
     return { message: 'You are authenticated' };
+  }
+
+  @ApiOperation({ summary: 'Login with Google' })
+  @Get('google')
+  @UseGuards(GoogleAuthGuard)
+  googleLogin() {
+    // guard redirects to Google
+  }
+
+  @ApiOperation({ summary: 'Google OAuth callback' })
+  @Get('google/callback')
+  @UseGuards(GoogleAuthGuard)
+  async googleCallback(@Req() req: Request, @Res() res: Response) {
+    const tokens = await this.authService.socialLogin(
+      'google',
+      req.user as GoogleProfile
+    );
+    return res.redirect(
+      `${this.configService.get('APP_URL')}?access_token=${
+        tokens.accessToken
+      }&refresh_token=${tokens.refreshToken}`
+    );
   }
 }

@@ -12,7 +12,8 @@ export class CreateUserDto {
 
   @IsString()
   @MinLength(8)
-  password!: string;
+  @IsOptional()
+  password?: string;
 
   @IsString()
   @IsOptional()
@@ -24,9 +25,17 @@ export class CreateUserDto {
 
   @IsString()
   @IsOptional()
+  avatarUrl?: string;
+
+  @IsString()
+  @IsOptional()
   emailVerifyToken?: string;
 
   @IsDate()
   @IsOptional()
   emailVerifyTokenExp?: Date;
+
+  @IsDate()
+  @IsOptional()
+  emailVerifiedAt?: Date;
 }
