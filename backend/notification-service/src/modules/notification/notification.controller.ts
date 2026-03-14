@@ -14,13 +14,11 @@ export class NotificationController {
 
   constructor(private readonly mailService: MailService) {}
 
-  @EventPattern('send_verification_email')
+  @EventPattern('user.registered')
   async handleSendVerificationEmail(
     @Payload() payload: SendVerificationEmailPayload
   ) {
-    this.logger.log(
-      `Received send_verification_email event for ${payload.email}`
-    );
+    this.logger.log(`Received user.registered event for ${payload.email}`);
     await this.mailService.sendVerificationEmail(
       payload.email,
       payload.firstName,

@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -12,6 +13,7 @@ import { PrismaService } from '../database/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './strategies/jwt.strategy';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +21,9 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    @Inject('NOTIFICATION_SERVICE')
+    private readonly notificationClient: ClientProxy
   ) {}
 
   async register(dto: RegisterDto) {
@@ -39,7 +43,11 @@ export class AuthService {
       emailVerifyTokenExp,
     });
 
-    // TODO: send verification email
+    this.notificationClient.emit('user.registered', {
+      email: user.email,
+      firstName: user.firstName ?? user.email.split('@')[0] ?? '',
+      token: emailVerifyToken,
+    });
 
     return { message: 'Registration successful, please verify your email' };
   }
