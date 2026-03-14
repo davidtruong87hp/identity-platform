@@ -10,3 +10,19 @@ services:
       - /app/node_modules
     env_file:
       - backend/identity-service/.env
+    depends_on:
+      - identity-db
+
+  identity-db:
+    image: postgres:17-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: identity
+    volumes:
+      - identity-db-data:/var/lib/postgresql/data
+
+volumes:
+  identity-db-data:
