@@ -134,4 +134,30 @@ describe('Auth E2E', () => {
       }
     });
   });
+
+  describe('Profile', () => {
+    it('should throw if not authenticated', async () => {
+      try {
+        await axios.get('/profile');
+      } catch (err: any) {
+        expect(err.response.status).toBe(401);
+      }
+    });
+
+    it('should throw if not authenticated on update', async () => {
+      try {
+        await axios.patch('/profile', { firstName: 'John' });
+      } catch (err: any) {
+        expect(err.response.status).toBe(401);
+      }
+    });
+
+    it('should throw if not authenticated on avatar upload', async () => {
+      try {
+        await axios.post('/profile/avatar');
+      } catch (err: any) {
+        expect(err.response.status).toBe(401);
+      }
+    });
+  });
 });

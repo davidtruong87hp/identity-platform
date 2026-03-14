@@ -91,6 +91,37 @@ services:
       - "${MAIL_SMTP_PORT}:1025"
       - "${MAIL_UI_PORT}:8025"
 
+  minio:
+    image: minio/minio
+    ports:
+      - "${MINIO_API_PORT}:9000"
+      - "${MINIO_UI_PORT}:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  minio-init:
+    image: minio/mc
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+      mc mb --ignore-existing local/${MINIO_BUCKET};
+      mc anonymous set public local/${MINIO_BUCKET};
+      echo 'MinIO bucket created successfully';
+      "
+
 volumes:
   identity-db-data:
   rabbitmq-data:
+  minio-data:

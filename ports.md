@@ -22,3 +22,5 @@
 | rabbitmq | 15672         | 15673         | RabbitMQ Management UI |
 | mailhog  | 1025          | 1025          | SMTP (dev)             |
 | mailhog  | 8025          | 8025          | Mailhog Web UI         |
+| minio    | 9000          | 9000          | MinIO S3 API           |
+| minio    | 9001          | 9001          | MinIO Console UI       |

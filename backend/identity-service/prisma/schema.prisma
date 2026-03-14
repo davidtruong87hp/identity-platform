@@ -18,6 +18,7 @@ model User {
   password              String
   firstName             String?
   lastName              String?
+  avatarUrl             String?
   isActive              Boolean        @default(true)
   emailVerifiedAt       DateTime?
   emailVerifyToken      String?        @unique
