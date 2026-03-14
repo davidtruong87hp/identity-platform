@@ -20,6 +20,7 @@ import {
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ProfileService } from './profile.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { AvatarValidationPipe } from './pipes/avatar-validation.pipe';
 
 @ApiTags('Profile')
 @ApiBearerAuth()
@@ -45,9 +46,13 @@ export class ProfileController {
   @ApiOperation({ summary: 'Upload profile avatar' })
   @ApiConsumes('multipart/form-data')
   @ApiResponse({ status: 201, description: 'Avatar uploaded successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid file type or size' })
   @Post('avatar')
   @UseInterceptors(FileInterceptor('file'))
-  uploadAvatar(@Request() req: any, @UploadedFile() file: Express.Multer.File) {
+  uploadAvatar(
+    @Request() req: any,
+    @UploadedFile(AvatarValidationPipe) file: Express.Multer.File
+  ) {
     return this.profileService.uploadAvatar(req.user.id, file);
   }
 }
