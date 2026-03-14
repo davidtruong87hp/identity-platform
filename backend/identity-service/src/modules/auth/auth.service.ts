@@ -6,7 +6,7 @@ import {
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { UserService } from '../user/user.service';
 import { PrismaService } from '../database/prisma.service';
 import { RegisterDto } from './dto/register.dto';
@@ -29,7 +29,7 @@ export class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-    const emailVerifyToken = uuidv4();
+    const emailVerifyToken = randomUUID();
     const emailVerifyTokenExp = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
     const user = await this.userService.create({
@@ -124,7 +124,7 @@ export class AuthService {
       ) as JwtSignOptions['expiresIn'],
     });
 
-    const refreshTokenValue = uuidv4();
+    const refreshTokenValue = randomUUID();
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 

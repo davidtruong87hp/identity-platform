@@ -24,3 +24,13 @@ identity-generate:
 
 identity-studio:
 	docker compose exec identity-service npx nx run identity:prisma:studio
+
+identity-migrate-test:
+	docker compose exec -e DATABASE_URL=postgresql://postgres:postgres@identity-db-test:5432/identity_test identity-service npx nx run identity:prisma:migrate
+	docker compose exec -e DATABASE_URL=postgresql://postgres:postgres@identity-db-test:5432/identity_test identity-service npx nx run identity:prisma:generate
+
+identity-test:
+	docker compose exec identity-service npx nx run identity:test
+
+identity-test-e2e:
+	docker compose exec -e HOST=localhost -e PORT=3000 identity-service npx nx run identity-e2e:e2e
