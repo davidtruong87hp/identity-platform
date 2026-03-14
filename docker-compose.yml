@@ -1,0 +1,12 @@
+services:
+  identity-service:
+    build:
+      context: .
+      dockerfile: backend/identity-service/Dockerfile.dev
+    ports:
+      - "3002:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - backend/identity-service/.env
