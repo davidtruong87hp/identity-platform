@@ -16,6 +16,7 @@ import Joi from 'joi';
         JWT_EXPIRES_IN: Joi.string().default('15m'),
         JWT_REFRESH_TOKEN_EXPIRES_IN: Joi.string().default('7d'),
         RABBITMQ_URL: Joi.string().required(),
+        ALLOWED_REDIRECT_URIS: Joi.string().required(),
       }),
     }),
   ],

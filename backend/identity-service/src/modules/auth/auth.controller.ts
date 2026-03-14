@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Post,
+  Query,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import type { Response } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -34,8 +44,17 @@ export class AuthController {
   })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @Post('login')
-  login(@Body() dto: LoginDto) {
-    return this.authService.login(dto);
+  login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
+    const result = this.authService.login(dto);
+
+    if ('redirect' in result) {
+      return res.redirect(
+        HttpStatus.FOUND,
+        (result as { redirect: string }).redirect
+      );
+    }
+
+    return result;
   }
 
   @ApiOperation({ summary: 'Verify email address' })

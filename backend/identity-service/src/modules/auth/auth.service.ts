@@ -52,7 +52,22 @@ export class AuthService {
     return { message: 'Registration successful, please verify your email' };
   }
 
-  async login(dto: LoginDto) {
+  async login(
+    dto: LoginDto
+  ): Promise<
+    { accessToken: string; refreshToken: string } | { redirect: string }
+  > {
+    if (dto.redirectUri) {
+      const allowedUris = this.configService
+        .get<string>('ALLOWED_REDIRECT_URIS')!
+        .split(',')
+        .map((uri) => uri.trim());
+
+      if (!allowedUris.includes(dto.redirectUri)) {
+        throw new BadRequestException('Invalid redirect URI');
+      }
+    }
+
     const user = await this.userService.findByEmail(dto.email);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -72,6 +87,15 @@ export class AuthService {
     }
 
     const tokens = await this.generateTokens(user.id, user.email);
+
+    if (dto.redirectUri) {
+      const redirectUrl = new URL(dto.redirectUri);
+      redirectUrl.searchParams.set('access_token', tokens.accessToken);
+      redirectUrl.searchParams.set('refresh_token', tokens.refreshToken);
+
+      return { redirect: redirectUrl.toString() };
+    }
+
     return tokens;
   }
 

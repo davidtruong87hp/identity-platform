@@ -81,6 +81,20 @@ describe('Auth E2E', () => {
     });
   });
 
+  describe('POST /auth/login with redirect', () => {
+    it('should throw if redirect URI is not allowed', async () => {
+      try {
+        await axios.post('/auth/login', {
+          email: testUser.email,
+          password: testUser.password,
+          redirectUri: 'http://evil.com',
+        });
+      } catch (err: any) {
+        expect(err.response.status).toBe(400);
+      }
+    });
+  });
+
   describe('GET /auth/verify-email', () => {
     it('should throw if token is invalid', async () => {
       try {

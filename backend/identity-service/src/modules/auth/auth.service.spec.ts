@@ -150,6 +150,46 @@ describe('AuthService', () => {
     });
   });
 
+  describe('login with redirect', () => {
+    it('should throw if redirect URI is not allowed', async () => {
+      mockUserService.findByEmail.mockResolvedValue(mockUser);
+      jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
+      mockConfigService.get.mockImplementation((key: string) => {
+        if (key === 'ALLOWED_REDIRECT_URIS') return 'http://localhost:3000';
+        return 'mock-value';
+      });
+
+      await expect(
+        authService.login({
+          email: 'test@example.com',
+          password: 'password123',
+          redirectUri: 'http://evil.com',
+        })
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should return redirect url if redirect URI is allowed', async () => {
+      mockUserService.findByEmail.mockResolvedValue(mockUser);
+      jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
+      mockPrismaService.refreshToken.create.mockResolvedValue({});
+      mockConfigService.get.mockImplementation((key: string) => {
+        if (key === 'ALLOWED_REDIRECT_URIS') return 'http://localhost:3000';
+        return 'mock-value';
+      });
+
+      const result = await authService.login({
+        email: 'test@example.com',
+        password: 'password123',
+        redirectUri: 'http://localhost:3000',
+      });
+
+      expect(result).toHaveProperty('redirect');
+      expect((result as any).redirect).toContain('http://localhost:3000');
+      expect((result as any).redirect).toContain('access_token');
+      expect((result as any).redirect).toContain('refresh_token');
+    });
+  });
+
   describe('verifyEmail', () => {
     it('should throw if token is invalid', async () => {
       mockUserService.findByEmailVerifyToken.mockResolvedValue(null);
