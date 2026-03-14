@@ -8,6 +8,12 @@
     },
     {
       "path": "./backend/identity-service"
+    },
+    {
+      "path": "./backend/notification-service-e2e"
+    },
+    {
+      "path": "./backend/notification-service"
     }
   ]
 }

@@ -16,5 +16,9 @@
 
 ## Tools
 
-| Service | Internal Port | External Port | Description |
-| ------- | ------------- | ------------- | ----------- |
+| Service  | Internal Port | External Port | Description            |
+| -------- | ------------- | ------------- | ---------------------- |
+| rabbitmq | 5672          | 5672          | RabbitMQ AMQP          |
+| rabbitmq | 15672         | 15673         | RabbitMQ Management UI |
+| mailhog  | 1025          | 1025          | SMTP (dev)             |
+| mailhog  | 8025          | 8025          | Mailhog Web UI         |

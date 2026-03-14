@@ -51,7 +51,10 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["backend/identity-service-e2e/**/*"]
+      "exclude": [
+        "backend/identity-service-e2e/**/*",
+        "backend/notification-service-e2e/**/*"
+      ]
     }
   ],
   "targetDefaults": {

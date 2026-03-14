@@ -57,5 +57,40 @@ services:
       timeout: 5s
       retries: 5
 
+  notification-service:
+    build:
+      context: .
+      dockerfile: backend/notification-service/Dockerfile.dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - backend/notification-service/.env
+    depends_on:
+      - rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "${RABBITMQ_PORT}:5672"
+      - "${RABBITMQ_UI_PORT}:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmq
+      RABBITMQ_DEFAULT_PASS: rabbitmq
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "${MAIL_SMTP_PORT}:1025"
+      - "${MAIL_UI_PORT}:8025"
+
 volumes:
   identity-db-data:
+  rabbitmq-data:
