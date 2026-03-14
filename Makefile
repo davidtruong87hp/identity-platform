@@ -37,3 +37,11 @@ identity-test:
 
 identity-test-e2e: identity-db-test-reset identity-migrate-test
 	docker compose exec -e HOST=identity-service-test -e PORT=3000 identity-service-test npx nx run identity-e2e:e2e
+
+identity-rebuild:
+	docker compose build --no-cache identity-service identity-service-test
+	docker compose up -d identity-service identity-service-test
+
+test: identity-test identity-test-e2e
+
+test-fresh: identity-rebuild identity-db-test-reset identity-migrate-test identity-test identity-test-e2e

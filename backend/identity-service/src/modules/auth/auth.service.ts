@@ -163,4 +163,51 @@ export class AuthService {
 
     return { message: 'Logged out successfully' };
   }
+
+  async forgotPassword(email: string) {
+    const user = await this.userService.findByEmail(email);
+
+    // always return success to prevent email enumeration
+    if (!user) {
+      return { message: 'If that email exists, a reset link has been sent' };
+    }
+
+    const passwordResetToken = randomUUID();
+    const passwordResetTokenExp = new Date(Date.now() + 1 * 60 * 60 * 1000); // 1 hour
+
+    await this.userService.update(user.id, {
+      passwordResetToken,
+      passwordResetTokenExp,
+    });
+
+    this.notificationClient.emit('user.password_reset_requested', {
+      email: user.email,
+      firstName: user.firstName ?? user.email,
+      token: passwordResetToken,
+    });
+
+    return { message: 'If that email exists, a reset link has been sent' };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const user = await this.userService.findByPasswordResetToken(token);
+
+    if (!user) {
+      throw new BadRequestException('Invalid reset token');
+    }
+
+    if (user.passwordResetTokenExp && user.passwordResetTokenExp < new Date()) {
+      throw new BadRequestException('Reset token has expired');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await this.userService.update(user.id, {
+      password: hashedPassword,
+      passwordResetToken: null,
+      passwordResetTokenExp: null,
+    });
+
+    return { message: 'Password reset successfully' };
+  }
 }

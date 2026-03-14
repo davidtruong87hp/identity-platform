@@ -8,6 +8,12 @@ export interface SendVerificationEmailPayload {
   token: string;
 }
 
+export interface SendPasswordResetEmailPayload {
+  email: string;
+  firstName: string;
+  token: string;
+}
+
 @Controller()
 export class NotificationController {
   private readonly logger = new Logger(NotificationController.name);
@@ -20,6 +26,20 @@ export class NotificationController {
   ) {
     this.logger.log(`Received user.registered event for ${payload.email}`);
     await this.mailService.sendVerificationEmail(
+      payload.email,
+      payload.firstName,
+      payload.token
+    );
+  }
+
+  @EventPattern('user.password_reset_requested')
+  async handlePasswordResetRequested(
+    @Payload() payload: SendPasswordResetEmailPayload
+  ) {
+    this.logger.log(
+      `Received user.password_reset_requested event for ${payload.email}`
+    );
+    await this.mailService.sendPasswordResetEmail(
       payload.email,
       payload.firstName,
       payload.token

@@ -27,6 +27,7 @@ const mockUser = {
 const mockUserService = {
   findByEmail: jest.fn(),
   findByEmailVerifyToken: jest.fn(),
+  findByPasswordResetToken: jest.fn(),
   create: jest.fn(),
   update: jest.fn(),
 };
@@ -212,6 +213,68 @@ describe('AuthService', () => {
 
       const result = await authService.logout('valid-token');
       expect(result).toEqual({ message: 'Logged out successfully' });
+    });
+  });
+
+  describe('forgotPassword', () => {
+    it('should return success even if email does not exist', async () => {
+      mockUserService.findByEmail.mockResolvedValue(null);
+
+      const result = await authService.forgotPassword(
+        'nonexistent@example.com'
+      );
+      expect(result).toEqual({
+        message: 'If that email exists, a reset link has been sent',
+      });
+    });
+
+    it('should send reset email if user exists', async () => {
+      mockUserService.findByEmail.mockResolvedValue(mockUser);
+      mockUserService.update.mockResolvedValue({});
+
+      const result = await authService.forgotPassword('test@example.com');
+      expect(result).toEqual({
+        message: 'If that email exists, a reset link has been sent',
+      });
+      expect(mockNotificationClient.emit).toHaveBeenCalledWith(
+        'user.password_reset_requested',
+        expect.objectContaining({ email: mockUser.email })
+      );
+    });
+  });
+
+  describe('resetPassword', () => {
+    it('should throw if token is invalid', async () => {
+      mockUserService.findByPasswordResetToken.mockResolvedValue(null);
+
+      await expect(
+        authService.resetPassword('invalid-token', 'newpassword123')
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw if token is expired', async () => {
+      mockUserService.findByPasswordResetToken.mockResolvedValue({
+        ...mockUser,
+        passwordResetTokenExp: new Date(Date.now() - 1000),
+      });
+
+      await expect(
+        authService.resetPassword('expired-token', 'newpassword123')
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should reset password successfully', async () => {
+      mockUserService.findByPasswordResetToken.mockResolvedValue({
+        ...mockUser,
+        passwordResetTokenExp: new Date(Date.now() + 10000),
+      });
+      mockUserService.update.mockResolvedValue({});
+
+      const result = await authService.resetPassword(
+        'valid-token',
+        'newpassword123'
+      );
+      expect(result).toEqual({ message: 'Password reset successfully' });
     });
   });
 });

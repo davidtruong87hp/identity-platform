@@ -53,4 +53,27 @@ export class MailService {
 
     this.logger.log(`Verification email sent to ${to}`);
   }
+
+  async sendPasswordResetEmail(
+    to: string,
+    firstName: string,
+    token: string
+  ): Promise<void> {
+    const appUrl = this.configService.get<string>('APP_URL');
+    const resetUrl = `${appUrl}/auth/reset-password?token=${token}`;
+
+    const html = this.compileTemplate('reset-password', {
+      firstName,
+      resetUrl,
+    });
+
+    await this.transporter.sendMail({
+      from: this.configService.get<string>('MAIL_FROM'),
+      to,
+      subject: 'Reset your password',
+      html,
+    });
+
+    this.logger.log(`Password reset email sent to ${to}`);
+  }
 }

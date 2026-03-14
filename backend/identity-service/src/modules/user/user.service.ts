@@ -30,4 +30,8 @@ export class UserService {
   async delete(id: string) {
     return this.userRepository.delete(id);
   }
+
+  async findByPasswordResetToken(token: string) {
+    return this.userRepository.findByPasswordResetToken(token);
+  }
 }
