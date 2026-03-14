@@ -12,6 +12,9 @@ import Joi from 'joi';
           .valid('development', 'production', 'test')
           .default('development'),
         DATABASE_URL: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
+        JWT_EXPIRES_IN: Joi.string().default('15m'),
+        JWT_REFRESH_TOKEN_EXPIRES_IN: Joi.string().default('7d'),
       }),
     }),
   ],
