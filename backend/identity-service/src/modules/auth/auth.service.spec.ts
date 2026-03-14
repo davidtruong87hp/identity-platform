@@ -47,6 +47,10 @@ const mockConfigService = {
   get: jest.fn().mockReturnValue('mock-value'),
 };
 
+const mockNotificationClient = {
+  emit: jest.fn(),
+};
+
 describe('AuthService', () => {
   let authService: AuthService;
 
@@ -58,6 +62,7 @@ describe('AuthService', () => {
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: JwtService, useValue: mockJwtService },
         { provide: ConfigService, useValue: mockConfigService },
+        { provide: 'NOTIFICATION_SERVICE', useValue: mockNotificationClient },
       ],
     }).compile();
 
