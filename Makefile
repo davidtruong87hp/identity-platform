@@ -17,6 +17,7 @@ logs:
 # Identity service
 identity-migrate:
 	docker compose exec identity-service npx nx run identity:prisma:migrate
+	docker compose exec identity-service npx nx run identity:prisma:generate
 
 identity-generate:
 	docker compose exec identity-service npx nx run identity:prisma:generate
