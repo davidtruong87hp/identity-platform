@@ -110,4 +110,14 @@ describe('Auth E2E', () => {
       }
     });
   });
+
+  describe('POST /auth/logout', () => {
+    it('should throw if no token provided', async () => {
+      try {
+        await axios.post('/auth/logout', { refreshToken: 'invalid-token' });
+      } catch (err: any) {
+        expect(err.response.status).toBe(401);
+      }
+    });
+  });
 });

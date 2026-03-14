@@ -146,4 +146,21 @@ export class AuthService {
 
     return { accessToken, refreshToken: refreshTokenValue };
   }
+
+  async logout(refreshToken: string) {
+    const token = await this.prisma.refreshToken.findUnique({
+      where: { token: refreshToken },
+    });
+
+    if (!token || token.revokedAt) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    await this.prisma.refreshToken.update({
+      where: { id: token.id },
+      data: { revokedAt: new Date() },
+    });
+
+    return { message: 'Logged out successfully' };
+  }
 }

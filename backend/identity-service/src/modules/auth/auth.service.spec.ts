@@ -180,4 +180,38 @@ describe('AuthService', () => {
       expect(result).toEqual({ message: 'Email verified successfully' });
     });
   });
+
+  describe('logout', () => {
+    it('should throw if refresh token is invalid', async () => {
+      mockPrismaService.refreshToken.findUnique.mockResolvedValue(null);
+
+      await expect(authService.logout('invalid-token')).rejects.toThrow(
+        UnauthorizedException
+      );
+    });
+
+    it('should throw if refresh token is already revoked', async () => {
+      mockPrismaService.refreshToken.findUnique.mockResolvedValue({
+        id: 'uuid-1',
+        token: 'valid-token',
+        revokedAt: new Date(),
+      });
+
+      await expect(authService.logout('valid-token')).rejects.toThrow(
+        UnauthorizedException
+      );
+    });
+
+    it('should logout successfully', async () => {
+      mockPrismaService.refreshToken.findUnique.mockResolvedValue({
+        id: 'uuid-1',
+        token: 'valid-token',
+        revokedAt: null,
+      });
+      mockPrismaService.refreshToken.update.mockResolvedValue({});
+
+      const result = await authService.logout('valid-token');
+      expect(result).toEqual({ message: 'Logged out successfully' });
+    });
+  });
 });
