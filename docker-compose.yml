@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: backend/identity-service/Dockerfile.dev
     ports:
-      - "3002:3000"
+      - "${IDENTITY_SERVICE_PORT}:3000"
     volumes:
       - .:/app
       - /app/node_modules
@@ -14,10 +14,23 @@ services:
       identity-db:
         condition: service_healthy
 
+  identity-service-test:
+    image: identity-platform-identity-service
+    ports:
+      - "${IDENTITY_SERVICE_TEST_PORT}:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - backend/identity-service/.env.test
+    depends_on:
+      identity-db-test:
+        condition: service_healthy
+
   identity-db:
     image: postgres:17-alpine
     ports:
-      - "5432:5432"
+      - "${IDENTITY_DB_PORT}:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -33,7 +46,7 @@ services:
   identity-db-test:
     image: postgres:17-alpine
     ports:
-      - "5433:5432"
+      - "${IDENTITY_DB_TEST_PORT}:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
