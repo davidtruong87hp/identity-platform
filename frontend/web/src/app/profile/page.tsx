@@ -1,12 +1,17 @@
 'use client';
 
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import { authApi } from '@/lib/api';
+import { UpdateProfileForm } from '@/components/profile/UpdateProfileForm';
+import { AvatarUpload } from '@/components/profile/AvatarUpload';
+import { Modal } from '@/components/ui/Modal';
 
 export default function ProfilePage() {
   const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ['me'],
@@ -26,33 +31,40 @@ export default function ProfilePage() {
     );
   }
 
+  const fallbackLetter =
+    data?.firstName?.[0] ?? data?.email?.[0]?.toUpperCase();
+
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+          {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
-            <Button
-              variant="outline"
-              onClick={handleLogout}
-              className="w-auto px-4"
-            >
-              Logout
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setIsModalOpen(true)}
+                className="w-auto px-4"
+              >
+                Edit profile
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleLogout}
+                className="w-auto px-4"
+              >
+                Logout
+              </Button>
+            </div>
           </div>
 
+          {/* Avatar + info */}
           <div className="flex items-center gap-6 mb-8">
-            {data?.avatarUrl ? (
-              <img
-                src={data.avatarUrl}
-                alt="Avatar"
-                className="w-20 h-20 rounded-full object-cover"
-              />
-            ) : (
-              <div className="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-2xl font-bold">
-                {data?.firstName?.[0] ?? data?.email?.[0]?.toUpperCase()}
-              </div>
-            )}
+            <AvatarUpload
+              currentAvatarUrl={data?.avatarUrl}
+              fallbackLetter={fallbackLetter}
+            />
             <div>
               <h2 className="text-xl font-semibold text-gray-900">
                 {data?.firstName && data?.lastName
@@ -74,6 +86,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
+          {/* Details grid */}
           <div className="grid grid-cols-2 gap-4 border-t pt-6">
             <div>
               <p className="text-sm text-gray-500">First name</p>
@@ -100,6 +113,23 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <Modal
+          title="Edit profile"
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        >
+          <UpdateProfileForm
+            defaultValues={{
+              firstName: data?.firstName ?? '',
+              lastName: data?.lastName ?? '',
+            }}
+            onSuccess={() => setIsModalOpen(false)}
+          />
+        </Modal>
+      )}
     </div>
   );
 }

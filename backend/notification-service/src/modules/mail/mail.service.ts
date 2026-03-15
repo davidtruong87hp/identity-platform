@@ -37,7 +37,7 @@ export class MailService {
     token: string
   ): Promise<void> {
     const appUrl = this.configService.get<string>('APP_URL');
-    const verifyUrl = `${appUrl}/auth/verify-email?token=${token}`;
+    const verifyUrl = `${appUrl}/verify-email?token=${token}`;
 
     const html = this.compileTemplate('verify-email', {
       firstName,
@@ -60,7 +60,7 @@ export class MailService {
     token: string
   ): Promise<void> {
     const appUrl = this.configService.get<string>('APP_URL');
-    const resetUrl = `${appUrl}/auth/reset-password?token=${token}`;
+    const resetUrl = `${appUrl}/reset-password?token=${token}`;
 
     const html = this.compileTemplate('reset-password', {
       firstName,

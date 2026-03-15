@@ -120,6 +120,19 @@ services:
       mc anonymous set public local/${MINIO_BUCKET};
       echo 'MinIO bucket created successfully';
       "
+  web:
+    build:
+      context: .
+      dockerfile: frontend/web/Dockerfile.dev
+    ports:
+      - "${WEB_PORT}:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - frontend/web/.env.local
+    depends_on:
+      - identity-service
 
 volumes:
   identity-db-data:
