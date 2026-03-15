@@ -1,0 +1,33 @@
+{
+  "name": "@org/web",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "name": "web",
+    "targets": {
+      "dev": {
+        "command": "next dev",
+        "options": {
+          "cwd": "frontend/web"
+        }
+      },
+      "build": {
+        "command": "next build",
+        "options": {
+          "cwd": "frontend/web"
+        }
+      },
+      "start": {
+        "command": "next start",
+        "options": {
+          "cwd": "frontend/web"
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "next": "~16.0.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

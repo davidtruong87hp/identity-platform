@@ -1,3 +1,7 @@
 packages:
-  - 'packages/*'
-  - 'backend/*'
+  - packages/*
+  - backend/*
+  - frontend/*
+ignoredBuiltDependencies:
+  - esbuild
+  - sharp

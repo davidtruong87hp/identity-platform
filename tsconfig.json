@@ -14,6 +14,12 @@
     },
     {
       "path": "./backend/notification-service"
+    },
+    {
+      "path": "./frontend/web-e2e"
+    },
+    {
+      "path": "./frontend/web"
     }
   ]
 }
