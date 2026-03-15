@@ -8,6 +8,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+      - /app/.nx
     env_file:
       - backend/identity-service/.env
     depends_on:
@@ -21,6 +22,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+      - /app/.nx
     env_file:
       - backend/identity-service/.env.test
     depends_on:
@@ -64,6 +66,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+      - /app/.nx
     env_file:
       - backend/notification-service/.env
     depends_on:
@@ -129,6 +132,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+      - /app/.nx
     env_file:
       - frontend/web/.env.local
     depends_on:

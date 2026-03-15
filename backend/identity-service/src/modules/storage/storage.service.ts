@@ -39,7 +39,7 @@ export class StorageService {
       })
     );
 
-    const endpoint = this.configService.get<string>('S3_ENDPOINT');
+    const endpoint = this.configService.get<string>('S3_PUBLIC_URL');
     const url = `${endpoint}/${this.bucket}/${key}`;
     this.logger.log(`File uploaded to ${url}`);
     return url;

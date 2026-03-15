@@ -1,0 +1,42 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+dist
+.next
+build
+
+# NX cache
+.nx/cache
+.nx/workspace-data
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Version control
+.git
+.gitignore
+
+# Docker files themselves
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# AI assistant folders
+.claude
+.cursor
+.codex
+.gemini
+.opencode
+.vscode

@@ -6,13 +6,21 @@ up:
 down:
 	docker compose down
 
+down-volumes:
+	docker compose down -v
+
 build:
+	docker compose build
+
+rebuild:
 	docker compose build --no-cache
 
 restart: down build up
 
 logs:
 	docker compose logs -f
+
+reset: down-volumes rebuild up
 
 # Identity service
 identity-migrate:

@@ -8,7 +8,7 @@ const publicRoutes = [
   '/verify-email',
 ];
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const accessToken = req.cookies.get('access_token')?.value;
   const { pathname } = req.nextUrl;
 
