@@ -14,6 +14,13 @@ async function bootstrap() {
     })
   );
 
+  app.enableCors({
+    origin: process.env.ALLOWED_ORIGINS?.split(',') ?? [
+      'http://localhost:3004',
+    ],
+    credentials: true,
+  });
+
   const config = new DocumentBuilder()
     .setTitle('Identity Service API')
     .setDescription('Central authentication service for the identity platform')
