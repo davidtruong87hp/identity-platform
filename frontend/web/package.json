@@ -6,7 +6,7 @@
     "name": "web",
     "targets": {
       "dev": {
-        "command": "next dev",
+        "command": "next dev --hostname 0.0.0.0",
         "options": {
           "cwd": "frontend/web"
         }

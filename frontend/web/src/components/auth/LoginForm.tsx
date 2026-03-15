@@ -10,6 +10,7 @@ import { Button } from '../ui/Button';
 import { Alert } from '../ui/Alert';
 import { authApi } from '../../lib/api';
 import Link from 'next/link';
+import { SocialLoginButtons } from './SocialLoginButtons';
 
 const schema = z.object({
   email: z.string().email('Invalid email address'),
@@ -75,6 +76,8 @@ export function LoginForm() {
       <Button type="submit" loading={isPending}>
         Sign in
       </Button>
+
+      <SocialLoginButtons />
 
       <p className="text-center text-sm text-gray-600">
         Don't have an account?{' '}

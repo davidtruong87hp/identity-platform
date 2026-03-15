@@ -131,14 +131,16 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
   async googleCallback(@Req() req: Request, @Res() res: Response) {
-    const tokens = await this.authService.socialLogin(
-      'google',
-      req.user as GoogleProfile
-    );
-    return res.redirect(
-      `${this.configService.get('APP_URL')}?access_token=${
-        tokens.accessToken
-      }&refresh_token=${tokens.refreshToken}`
-    );
+    const profile = req.user as GoogleProfile;
+    const tokens = await this.authService.socialLogin('google', profile);
+
+    const redirectUri =
+      profile.redirectUri ?? this.configService.get<string>('APP_URL')!;
+
+    const redirectUrl = new URL(redirectUri);
+    redirectUrl.searchParams.set('access_token', tokens.accessToken);
+    redirectUrl.searchParams.set('refresh_token', tokens.refreshToken);
+
+    return res.redirect(redirectUrl.toString());
   }
 }
