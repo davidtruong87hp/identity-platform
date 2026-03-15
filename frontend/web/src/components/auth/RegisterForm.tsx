@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { Alert } from '../ui/Alert';
-import { authApi } from '../../lib/api';
+import { authApi } from '@/lib/api';
 import Link from 'next/link';
 
 const schema = z.object({

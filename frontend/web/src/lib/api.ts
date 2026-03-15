@@ -7,7 +7,14 @@ export const api = axios.create({
   },
 });
 
-// auth endpoints
+// internal Next.js API routes
+export const internalApi = axios.create({
+  baseURL: '',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
 export const authApi = {
   register: (data: {
     email: string;
@@ -17,7 +24,11 @@ export const authApi = {
   }) => api.post('/auth/register', data),
 
   login: (data: { email: string; password: string }) =>
-    api.post('/auth/login', data),
+    internalApi.post('/api/auth/login', data),
+
+  logout: () => internalApi.post('/api/auth/logout'),
+
+  me: () => internalApi.get('/api/auth/me'),
 
   forgotPassword: (email: string) =>
     api.post('/auth/forgot-password', { email }),

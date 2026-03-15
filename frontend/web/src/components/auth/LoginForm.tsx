@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { Alert } from '../ui/Alert';
@@ -19,7 +19,7 @@ const schema = z.object({
 type LoginFormData = z.infer<typeof schema>;
 
 export function LoginForm() {
-  const [success, setSuccess] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -31,11 +31,8 @@ export function LoginForm() {
 
   const { mutate, isPending, error } = useMutation({
     mutationFn: authApi.login,
-    onSuccess: (res) => {
-      const { access_token, refresh_token } = res.data;
-      localStorage.setItem('access_token', access_token);
-      localStorage.setItem('refresh_token', refresh_token);
-      setSuccess(true);
+    onSuccess: () => {
+      router.push('/profile');
     },
   });
 
@@ -43,7 +40,6 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      {success && <Alert type="success" message="Logged in successfully!" />}
       {error && (
         <Alert
           type="error"
