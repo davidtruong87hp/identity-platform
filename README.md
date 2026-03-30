@@ -1,105 +1,175 @@
-# New Nx Repository
+# Identity Platform
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+A full-stack identity and authentication platform built as an [Nx](https://nx.dev) monorepo. It provides user registration, login, email verification, password reset, Google OAuth, profile management, and avatar uploads — backed by a microservice architecture with event-driven email notifications.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+## Architecture
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
-## Try the full Nx platform
-🚀 If you haven't connected to Nx Cloud yet, [complete your setup here](https://cloud.nx.app/setup/connect-workspace/guide). Get faster builds with remote caching, distributed task execution, and self-healing CI. [See how your workspace can benefit](#nx-cloud).
-## Generate a library
+The monorepo is organised into three applications:
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
-```
+| Project | Path | Description |
+|---|---|---|
+| `identity` | `backend/identity-service` | NestJS REST API — auth, users, profiles, storage |
+| `notification` | `backend/notification-service` | NestJS microservice — email delivery via RabbitMQ |
+| `web` | `frontend/web` | Next.js 16 frontend |
 
-## Run tasks
+### Tech Stack
 
-To build the library use:
+**Frontend**
+- Next.js 16, React 19, TailwindCSS
+- TanStack Query, React Hook Form + Zod
 
-```sh
-npx nx build pkg1
-```
+**Backend**
+- NestJS 11, Prisma ORM, PostgreSQL 17
+- Passport.js (JWT + Google OAuth 2.0)
+- RabbitMQ (AMQP) for async messaging
+- MinIO (S3-compatible) for file storage
 
-To run any task with Nx use:
+**Tooling**
+- Nx 22 monorepo with pnpm
+- Docker Compose for local infrastructure
+- Playwright (e2e) + Jest (unit)
 
-```sh
-npx nx <target> <project-name>
-```
+## Features
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+- Email/password registration with email verification
+- Login with JWT access & refresh tokens
+- Google OAuth 2.0 sign-in
+- Forgot password / password reset flow
+- User profile management with avatar uploads
+- Transactional email notifications (Nodemailer + Mailpit in dev)
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Prerequisites
 
-## Versioning and releasing
+- [Docker](https://docs.docker.com/get-docker/) & Docker Compose
+- [Node.js](https://nodejs.org/) 20+
+- [pnpm](https://pnpm.io/) 9+
 
-To version and release the library use
+## Getting Started
 
-```
-npx nx release
-```
-
-Pass `--dry-run` to see what would happen without actually releasing the library.
-
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Keep TypeScript project references up to date
-
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
-```
-
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
+### 1. Install dependencies
 
 ```sh
-npx nx sync:check
+pnpm install
 ```
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+### 2. Configure environment variables
 
-## Nx Cloud
-
-Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
-
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Set up CI (non-Github Actions CI)
-
-**Note:** This is only required if your CI provider is not GitHub Actions.
-
-Use the following command to configure a CI workflow for your workspace:
+Each service ships an `.env.example` file. Copy and adjust them:
 
 ```sh
-npx nx g ci-workflow
+cp backend/identity-service/.env.example backend/identity-service/.env
+cp backend/notification-service/.env.example backend/notification-service/.env
+# Web uses .env.local — see frontend/web/.env.local
 ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Key variables for the identity service:
 
-## Install Nx Console
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `JWT_SECRET` | Secret used to sign JWTs |
+| `RABBITMQ_URL` | RabbitMQ AMQP connection URL |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth credentials |
+| `S3_*` | MinIO / S3 storage credentials |
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+### 3. Start infrastructure
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```sh
+make up
+```
 
-## Useful links
+This starts all Docker Compose services (databases, RabbitMQ, MinIO, Mailpit, and the apps themselves).
 
-Learn more:
+### 4. Run database migrations
 
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```sh
+make identity-migrate
+```
 
-And join the Nx community:
+## Service URLs (dev)
 
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+See [`ports.md`](ports.md) for the full port registry.
+
+| Service | URL |
+|---|---|
+| Web app | http://localhost:3004 |
+| Identity API | http://localhost:3002 |
+| RabbitMQ UI | http://localhost:15673 |
+| Mailpit (email) | http://localhost:8025 |
+| MinIO Console | http://localhost:9001 |
+
+## Development
+
+### Running tasks with Nx
+
+```sh
+# Serve an app locally (outside Docker)
+pnpm nx serve identity
+pnpm nx serve web
+
+# Build
+pnpm nx build identity
+
+# Lint
+pnpm nx lint identity
+
+# Run unit tests
+pnpm nx test identity
+```
+
+### Useful Make targets
+
+```sh
+make up                  # Start all services
+make down                # Stop all services
+make logs                # Tail logs
+make rebuild             # Rebuild and restart Docker images
+make reset               # Full reset (wipe volumes, rebuild, start)
+make identity-migrate    # Run Prisma migrations
+make identity-studio     # Open Prisma Studio
+make test                # Run all unit + e2e tests
+make test-fresh          # Rebuild + full test run from scratch
+```
+
+## Testing
+
+### Unit tests
+
+```sh
+make identity-test
+# or
+pnpm nx test identity
+```
+
+### E2e tests
+
+```sh
+make identity-test-e2e
+```
+
+This resets the test database, runs migrations against it, and executes Playwright e2e tests against the dedicated `identity-service-test` container.
+
+## Project Structure
+
+```
+identity-platform/
+├── backend/
+│   ├── identity-service/       # Auth & user management API
+│   │   └── src/modules/
+│   │       ├── auth/           # JWT, Google OAuth, token refresh
+│   │       ├── user/           # User CRUD
+│   │       ├── profile/        # Profile & avatar management
+│   │       ├── notification/   # Publishes events to RabbitMQ
+│   │       ├── storage/        # S3/MinIO file uploads
+│   │       └── database/       # Prisma setup
+│   └── notification-service/   # Email microservice
+│       └── src/modules/
+│           ├── mail/           # Nodemailer templates
+│           └── notification/   # RabbitMQ consumer
+├── frontend/
+│   └── web/                    # Next.js app
+│       └── src/app/
+│           ├── (auth)/         # Login, register, verify-email, reset-password
+│           └── profile/        # Profile page
+└── docker-compose.yml
+```
